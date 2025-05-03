@@ -1,3 +1,4 @@
+
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -27,4 +28,3 @@ if st.button("Buscar en BDNS"):
             st.error("Error al buscar en BDNS: " + str(e))
     else:
         st.warning("Introduce una palabra clave para buscar.")
-
