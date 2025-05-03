@@ -12,7 +12,7 @@ if st.button("Buscar en BDNS"):
     if not palabra_clave:
         st.warning("Introduce una palabra clave para buscar.")
     else:
-        url = "https://www.infosubvenciones.es/bdnstrans/api/convocatorias"
+        url = "https://www.subvenciones.gob.es/bdnstrans/api/convocatorias"
         params = {
             "textoLibre": palabra_clave,
             "idioma": "es",
