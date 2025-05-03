@@ -1,21 +1,30 @@
-
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
 import streamlit as st
 
-st.title("Buscador Automatizado de Subvenciones")
+st.title("Buscador Automatizado de Subvenciones (BDNS)")
 
-st.markdown("Esta herramienta te permite filtrar y acceder a convocatorias de subvenciones desde distintas fuentes oficiales.")
+palabra_clave = st.text_input("Buscar por palabra clave (ej. cooperativa, formación, innovación):")
 
-tipo_entidad = st.selectbox("Tipo de entidad", ["Cualquiera", "Cooperativa", "SL", "Autónomo", "Asociación"])
-sector = st.multiselect("Sector", ["Formación", "Innovación", "Social", "Medio ambiente", "Digitalización"])
-ambito = st.selectbox("Ámbito geográfico", ["Todos", "Unión Europea", "Estatal", "Autonómico", "Local"])
-cofinanciacion = st.radio("¿Requiere cofinanciación?", ["Cualquiera", "Sí", "No"])
-gastos = st.multiselect("Gastos elegibles", ["Personal", "Infraestructura", "Tecnología", "Viajes", "Formación"])
+if st.button("Buscar en BDNS"):
+    if palabra_clave:
+        url = f"https://www.subvenciones.gob.es/bdnstrans/GE/es/convocatorias?tipoBusqueda=avanzada&textoLibre={palabra_clave}"
+        try:
+            r = requests.get(url, timeout=10)
+            soup = BeautifulSoup(r.text, 'html.parser')
+            enlaces = soup.select("a[href*='/bdnstrans/GE/es/convocatoria/']")
+            resultados = []
+            for e in enlaces:
+                texto = e.get_text(strip=True)
+                link = "https://www.subvenciones.gob.es" + e.get("href")
+                resultados.append({"Título": texto, "Enlace": link})
+            df = pd.DataFrame(resultados).drop_duplicates()
+            st.success(f"{len(df)} resultados encontrados.")
+            for i, row in df.iterrows():
+                st.markdown(f"- [{row['Título']}]({row['Enlace']})")
+        except Exception as e:
+            st.error("Error al buscar en BDNS: " + str(e))
+    else:
+        st.warning("Introduce una palabra clave para buscar.")
 
-if st.button("Buscar subvenciones"):
-    st.success("Mostrando subvenciones filtradas (modo prototipo).")
-    st.write("🔗 [Subvención 1 - Horizonte Europa](https://ec.europa.eu/info/funding-tenders/opportunities/portal/)")
-    st.write("🔗 [Subvención 2 - BDNS (Innovación)](https://www.subvenciones.gob.es/)")
-    st.write("🔗 [Subvención 3 - Ayudas Euskadi](https://www.euskadi.eus/ayudas-subvenciones/)")
-
-st.markdown("---")
-st.markdown("Prototipo desarrollado por ChatGPT. Fuentes: BDNS, UE, Euskadi, entre otras.")
