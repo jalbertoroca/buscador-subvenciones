@@ -33,15 +33,20 @@ if st.button("Buscar en BDNS"):
             data = r.json()
             convocatorias = data.get("content", [])
             
-            # Mostrar resultados
+            # Mostrar resultados verdaderos
             if not convocatorias:
                 st.warning("No se encontraron convocatorias para esa palabra clave.")
             else:
                 st.success(f"Encontradas {len(convocatorias)} convocatorias:")
                 for conv in convocatorias:
-                    titulo = conv.get("tituloConvocatoria", "Sin título")
-                    cid    = conv.get("idConvocatoria")
-                    enlace = f"https://www.subvenciones.gob.es/bdnstrans/GE/es/convocatoria/{cid}"
+                    # Título (usa 'tituloConvocatoria' o, si no existe, 'descripcion')
+                    titulo = conv.get("tituloConvocatoria", conv.get("descripcion", "Sin título"))
+                    # El ID real está en 'numeroConvocatoria'
+                    numero = conv.get("numeroConvocatoria")
+                    if not numero:
+                        continue
+                    # URL de la ficha (singular 'convocatoria')
+                    enlace = f"https://www.subvenciones.gob.es/bdnstrans/GE/es/convocatoria/{numero}"
                     st.markdown(f"- [{titulo}]({enlace})")
         except Exception as e:
             st.error("Error al conectar con la API: " + str(e))
