@@ -1,2 +1,2 @@
-# buscador-subvenciones
-Repositorio hecho por chat- Buscador automatizado de subvenciones
+# Buscador de Subvenciones
+Aplicación web para filtrar y acceder a subvenciones desde fuentes oficiales como la BDNS, el portal europeo y otras.
